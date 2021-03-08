@@ -1,0 +1,12 @@
+{
+  "name": "lcdb",
+  "version": "4.4.5",
+  "description": "A simple local database using the Node.js file system module.",
+  "main": "index.js",
+  "keywords": [
+    "database",
+    "filesystem"
+  ],
+  "author": "d3tu",
+  "license": "MIT"
+}
