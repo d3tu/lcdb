@@ -1,6 +1,6 @@
 {
   "name": "lcdb",
-  "version": "4.4.5",
+  "version": "4.4.7",
   "description": "A simple local database using the Node.js file system module.",
   "main": "index.js",
   "keywords": [

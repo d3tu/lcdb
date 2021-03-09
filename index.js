@@ -1,86 +1,100 @@
-let fs = require('fs');
+const fs = require('fs');
 
-let path = 'lcdb.json';
+var path = 'lcdb.json',
+	methods = {
+		set: (key, val) => write(setObj(key, val, read())),
+		get: key => getObj(key, read()),
+		delete: key => write(delObj(key, read())),
+		has: key => (getObj(key, read()) ? true : false),
+		type: key => typeof getObj(key, read()),
+		push: (key, ...val) => {
+			if (!Array.isArray(...val)) val = Array(val);
 
-let methods = {
-	version: require('./package.json').version,
-	set: (key, val) => {
-		let obj = read();
+			let obj = read(),
+				objVal = getObj(key, obj) || [];
 
-		obj[key] = val;
+			if (!Array.isArray(objVal)) objVal = Array(objVal);
 
-		write(obj);
-	},
-	get: key => read()[key],
-	delete: key => {
-		let obj = read();
+			write(setObj(key, objVal.concat(...val), obj));
+		},
+		add: (key, val) => {
+			let obj = read(),
+				objVal = getObj(key, obj);
 
-		delete obj[key];
+			if (isNaN(objVal)) throw new Error('A value of key is not a number.');
 
-		write(obj);
-	},
-	add: (key, val) => {
-		let obj = read();
+			write(setObj(key, Number(objVal || 0) + val, obj));
+		},
+		subtract: (key, val) => {
+			let obj = read(),
+				objVal = getObj(key, obj);
 
-		if (obj[key] && typeof obj[key] != 'number')
-			throw new Error('A value of key is not a number.');
+			if (isNaN(objVal)) throw new Error('A value of key is not a number.');
 
-		obj[key] = (Number(obj[key]) || 0) + val;
+			write(setObj(key, Number(objVal || 0) - val, obj));
+		},
+		all: () => read(),
+		clear: () => write({})
+	};
 
-		write(obj);
-	},
-	subtract: (key, val) => {
-		let obj = read();
+module.exports = Object.assign(
+	{
+		version: require('./package.json').version,
+		path: ref => {
+			if (ref) {
+				ref = String(ref)
+					.split('/')
+					.filter(a => a);
 
-		if (obj[key] && typeof obj[key] != 'number')
-			throw new Error('A value of key is not a number.');
+				let name = ref.pop() + '.json';
 
-		obj[key] = (obj[key] || 0) - val;
+				let refName = (ref.length ? ref.join('/') + '/' : '') + name;
 
-		write(obj);
-	},
-	push: (key, ...val) => {
-		if (!Array.isArray(...val)) val = Array(val);
+				!fs.existsSync(refName) &&
+					ref.length >= 1 &&
+					fs.mkdirSync(ref.join('/'), { recursive: true });
 
-		let obj = read();
+				path = refName;
+			}
 
-		let objVal = obj[key] || [];
-
-		if (!Array.isArray(objVal)) objVal = Array(objVal);
-
-		obj[key] = objVal.concat(...val);
-
-		write(obj);
-	},
-	has: key => (read()[key] ? true : false),
-	all: () => read(),
-	type: key => typeof methods.get(key)
-};
-
-module.exports = Object.assign(methods, {
-	path: ref => {
-		if (ref) {
-			ref = String(ref)
-				.split('/')
-				.filter(a => a);
-
-			let name = ref.pop() + '.json';
-
-			let refName = (ref.length ? ref.join('/') + '/' : '') + name;
-
-			!fs.existsSync(refName) &&
-				ref.length >= 1 &&
-				fs.mkdirSync(ref.join('/'), { recursive: true });
-
-			path = refName;
+			return methods;
 		}
+	},
+	methods
+);
 
-		return methods;
+function getObj(ref, obj) {
+	return ref.split('/').reduce((a, b) => a[b], obj);
+}
+
+function setObj(ref, val, obj) {
+	ref = ref.split('/');
+	let res = obj;
+	while (ref.length > 1) {
+		let req = ref.shift();
+		res = res[req] = res[req] || {};
 	}
-});
+	res[ref] = val;
+	return obj;
+}
+
+function delObj(ref, obj) {
+	ref = ref.split('/');
+	let res = obj;
+	while (ref.length > 1) {
+		let req = ref.shift();
+		res = res[req] = res[req] || {};
+	}
+	delete res[ref];
+	return obj;
+}
 
 function read() {
-	return fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, 'utf8')) : {};
+	if (fs.existsSync(path)) {
+		let content = fs.readFileSync(path, 'utf8');
+		if (!content) return {};
+		else return JSON.parse(content);
+	} else return {};
 }
 
 function write(obj) {
