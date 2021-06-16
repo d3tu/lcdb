@@ -33,8 +33,68 @@ class Lcdb {
 		return true;
 	}
 	
+	add(ref, value) {
+		objm.set(this.obj, ref, Number((objm.get(this.obj, ref) || 0)) + Number(value));
+		
+		this._write();
+		
+		return true;
+	}
+	
+	subtract(ref, value) {
+		objm.set(this.obj, ref, Number((objm.get(this.obj, ref) || 0)) - Number(value));
+		
+		this._write();
+		
+		return true;
+	}
+	
+	push(ref, ...values) {
+		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).push(...values));
+		
+		this._write();
+		
+		return true;
+	}
+	
+	shift(ref) {
+		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).shift());
+		
+		this._write();
+		
+		return true;
+	}
+	
+	pop(ref) {
+		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).pop());
+		
+		this._write();
+		
+		return true;
+	}
+	
+	splice(ref, ...args) {
+		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).splice(...args));
+		
+		this._write();
+		
+		return true;
+	}
+	
+	type(path) {
+		return typeof objm.get(this.obj, path);
+	}
+	
 	all() {
 		return this.obj;
+	}
+	
+	clear() {
+		objm.set(this.obj, {});
+		
+		this._write();
+		
+		return true;
 	}
 	
 	_read() {
