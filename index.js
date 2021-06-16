@@ -22,11 +22,15 @@ class Lcdb {
 	}
 
 	get(ref) {
-		return objm.get(this.obj, ref);
+		return ref === "/" ? this.obj : objm.get(this.obj, ref);
 	}
 
 	delete(ref) {
-		objm.delete(this.obj, ref);
+		if (ref === "/") {
+			delete this.obj;
+			
+			this.obj = {};
+		} else objm.delete(this.obj, ref);
 
 		this._write();
 
@@ -81,8 +85,20 @@ class Lcdb {
 		return true;
 	}
 	
-	type(path) {
-		return typeof objm.get(this.obj, path);
+	type(ref) {
+		return typeof objm.get(this.obj, ref);
+	}
+	
+	entries(ref) {
+		return Object.entries(ref ? objm.get(this.obj, path) : this.obj);
+	}
+	
+	keys(ref) {
+		return Object.keys(ref ? objm.get(this.obj, path) : this.obj);
+	}
+	
+	values(ref) {
+		return Object.values(ref ? objm.get(this.obj, path) : this.obj);
 	}
 	
 	all() {
@@ -90,7 +106,9 @@ class Lcdb {
 	}
 	
 	clear() {
-		objm.set(this.obj, {});
+		delete this.obj;
+		
+		this.obj = {};
 		
 		this._write();
 		
