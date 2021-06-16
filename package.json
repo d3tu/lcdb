@@ -1,12 +1,17 @@
 {
-  "name": "lcdb",
-  "version": "4.4.7",
-  "description": "A simple local database using the Node.js file system module.",
-  "main": "index.js",
-  "keywords": [
-    "database",
-    "filesystem"
+	"name": "lcdb",
+	"version": "5.0.9",
+	"description": "Local database using File System.",
+	"main": "index.js",
+	"keywords": [
+    "filesystem",
+    "fs",
+    "localdatabase",
+    "db"
   ],
-  "author": "d3tu",
-  "license": "MIT"
+	"author": "ParalaxTeam",
+	"license": "MIT",
+	"dependencies": {
+		"objm": "^0.0.3"
+	}
 }
