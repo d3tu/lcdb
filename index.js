@@ -11,6 +11,9 @@ class Lcdb {
 		this.path = String(path ? path : "db");
 		this.obj = this._read(path);
 	}
+	get version() {
+		return require("./package.json").version;
+	}
 	set(ref, value) {
 		objm.set(this.obj, ref, value);
 		this._write();
@@ -25,10 +28,10 @@ class Lcdb {
 		this._write();
 		return true;
 	}
-	stats() {
+	get stats() {
 		return existsSync(this.path + ".json") ? statSync(this.path + ".json") : null;
 	}
-	all() {
+	get all() {
 		return this.obj;
 	}
 	clear() {
