@@ -3,13 +3,20 @@ const {
 	writeFileSync,
 	existsSync,
 	mkdirSync,
+	statSync
 } = require("fs"),
 	objm = require("objm");
 
 class Lcdb {
-	constructor(path) {
-		this.path = path;
-
+	constructor(path, options = {
+		replacer: null,
+		space: 2
+	}) {
+		if (typeof path === "object") options = path;
+		this.options = options;
+		var path = typeof path === "string" ? path : path.path;
+		this.path = path ? path : "db";
+		if (options.path) delete options.path;
 		this.obj = this._read(path);
 	}
 
@@ -37,8 +44,12 @@ class Lcdb {
 		return true;
 	}
 	
+	stat() {
+		return statSync(this.path);
+	}
+	
 	add(ref, value) {
-		objm.set(this.obj, ref, Number((objm.get(this.obj, ref) || 0)) + Number(value));
+		this.set(ref, Number(this.get(ref) || 0) + Number(value));
 		
 		this._write();
 		
@@ -46,7 +57,7 @@ class Lcdb {
 	}
 	
 	subtract(ref, value) {
-		objm.set(this.obj, ref, Number((objm.get(this.obj, ref) || 0)) - Number(value));
+		this.set(ref, Number(this.get(ref) || 0) - Number(value));
 		
 		this._write();
 		
@@ -54,7 +65,7 @@ class Lcdb {
 	}
 	
 	push(ref, ...values) {
-		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).push(...values));
+		this.set(ref, (this.get(ref) || []).push(...values));
 		
 		this._write();
 		
@@ -62,7 +73,7 @@ class Lcdb {
 	}
 	
 	shift(ref) {
-		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).shift());
+		this.set(ref, (this.get(ref) || []).shift());
 		
 		this._write();
 		
@@ -70,7 +81,7 @@ class Lcdb {
 	}
 	
 	pop(ref) {
-		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).pop());
+		this.set(ref, (this.get(ref) || []).pop());
 		
 		this._write();
 		
@@ -78,7 +89,7 @@ class Lcdb {
 	}
 	
 	splice(ref, ...args) {
-		objm.set(this.obj, ref, (objm.get(this.obj, ref) || []).splice(...args));
+		othis.set(ref, (this.get(ref) || []).splice(...args));
 		
 		this._write();
 		
@@ -86,19 +97,19 @@ class Lcdb {
 	}
 	
 	type(ref) {
-		return typeof objm.get(this.obj, ref);
+		return typeof this.get(ref);
 	}
 	
 	entries(ref) {
-		return Object.entries(ref ? objm.get(this.obj, path) : this.obj);
+		return Object.entries(ref ? this.get(ref) : this.obj);
 	}
 	
 	keys(ref) {
-		return Object.keys(ref ? objm.get(this.obj, path) : this.obj);
+		return Object.keys(ref ? this.get(ref) : this.obj);
 	}
 	
 	values(ref) {
-		return Object.values(ref ? objm.get(this.obj, path) : this.obj);
+		return Object.values(ref ? this.get(ref) : this.obj);
 	}
 	
 	all() {
@@ -126,7 +137,6 @@ class Lcdb {
 
 	_write() {
 		var parts = this.path.split("/");
-
 		parts.pop();
 
 		var length = parts.length,
@@ -136,8 +146,8 @@ class Lcdb {
 			recursive: true
 		});
 
-		return writeFileSync(this.path + ".json", JSON.stringify(this.obj, null, 2));
+		return writeFileSync(this.path + ".json", JSON.stringify(this.obj, this.options.replacer, this.options.space));
 	}
 }
 
-module.exports = (ref) => new Lcdb(ref);
+module.exports = path => new Lcdb(path);
