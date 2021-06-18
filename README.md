@@ -4,16 +4,17 @@ A simple local database using the Node.js file system module.
 ```js
 const db = require("lcdb")(
   "path", // Example: db or dbs/db.
-  { replacer: null, space: 2, path: "optional" } // For JSON.stringify. (Optional)
+  { replacer: null, space: 2, path: "optional", split: "/" } // For JSON.stringify. (Optional)
 );
 
 // Use / to reference notation.
 
+db.version;
 db.set("ref", "data");
 db.get("ref or /");
 db.delete("ref or /");
-db.stats();
-db.all();
+db.stats;
+db.all;
 db.clear();
 db.add("ref", 123);
 db.subtract("ref", 123);
