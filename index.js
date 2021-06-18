@@ -43,9 +43,9 @@ class Lcdb {
 		if (typeof path === "object") {
 			path = options.path;
 			options = path;
-			manager = manager(options.split);
 			if (options.path) delete options.path;
 		}
+		manager = manager(options.split);
 		this.options = options;
 		this.path = String(path ? path : "db");
 		this.obj = this._read(path);
