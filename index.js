@@ -2,11 +2,13 @@ const { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } = require
 objm = require("objm");
 class Lcdb {
 	constructor(path, options = { replacer: null, space: 2 }) {
-		if (typeof path === "object") options = path;
+		if (typeof path === "object") {
+			path = options.path;
+			options = path;
+			if (options.path) delete options.path;
+		}
 		this.options = options;
-		path = typeof path === "object" ? path.path : path;
 		this.path = String(path ? path : "db");
-		if (options.path) delete options.path;
 		this.obj = this._read(path);
 	}
 	set(ref, value) {
