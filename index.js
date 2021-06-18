@@ -24,7 +24,16 @@ class Lcdb {
 		return true;
 	}
 	stats() {
-		return statSync(this.path);
+		return existsSync(this.path + ".json") ? statSync(this.path + ".json") : null;
+	}
+	all() {
+		return this.obj;
+	}
+	clear() {
+		delete this.obj;
+		this.obj = {};
+		this._write();
+		return true;
 	}
 	add(ref, value) {
 		return this.set(ref, Number(this.get(ref) || 0) + Number(value));
@@ -63,15 +72,6 @@ class Lcdb {
 	}
 	values(ref) {
 		return Object.values(ref ? this.get(ref) : this.obj);
-	}
-	all() {
-		return this.obj;
-	}
-	clear() {
-		delete this.obj;
-		this.obj = {};
-		this._write();
-		return true;
 	}
 	_read() {
 		if (existsSync(this.path + ".json")) {
