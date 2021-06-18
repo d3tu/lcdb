@@ -2,7 +2,10 @@
 A simple local database using the Node.js file system module.
 
 ```js
-const db = require("lcdb")("path"); // Example: db or dbs/db.
+const db = require("lcdb")(
+  "path", // Example: db or dbs/db.
+  { replacer: null, space: 2, path: "optional" } // For JSON.stringify. (Optional)
+);
 
 // Use / to reference notation.
 
