@@ -5,6 +5,5 @@
 	"main": "index.js",
 	"keywords": ["filesystem", "fs", "localdatabase", "db"],
 	"author": "ParalaxTeam",
-	"license": "MIT",
-	"dependencies": { "objm": "^0.0.3" }
+	"license": "MIT"
 }
