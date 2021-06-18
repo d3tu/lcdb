@@ -90,4 +90,4 @@ class Lcdb {
 		return writeFileSync(this.path + ".json", JSON.stringify(this.obj, this.options.replacer, this.options.space));
 	}
 }
-module.exports = path => new Lcdb(path);
+module.exports = (path, options) => new Lcdb(path, options);
