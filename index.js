@@ -5,8 +5,8 @@ class Lcdb {
 	constructor(path, options = { replacer: null, space: 2 }) {
 		if (typeof path === "object") options = path;
 		this.options = options;
-		var path = typeof path === "string" ? path : path.path;
-		this.path = path ? path : "db";
+		path = typeof path === "object" ? path.path : path;
+		this.path = String(path ? path : "db");
 		if (options.path) delete options.path;
 		this.obj = this._read(path);
 	}
