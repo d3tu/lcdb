@@ -1,43 +1,4 @@
 const { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } = require("fs");
-function manager(split) {
-	return {
-	set: (o, k, v) => {
-	 	try {
-		  	k = String(k).split(split);
-		  	let b = o;
-		  	while (k.length > 1) {
-		  		const a = k.shift();
-		   		b = b[a] = b[a] || {};
-		   	}
-		  	b[k] = v;
-		  	return o;
-	  	} catch (e) {
-	  		return undefined;
-	  	}
-	  },
-  	get: (o, k) => {
-	  	try {
-		  	return String(k).split(split).reduce((a, b) => (a || {})[b], o);
-	  	} catch (e) {
-	  		return undefined;
-	  	}
-  	},
-  	delete: (o, k) => {
-		  try {
-		  	k = String(k).split(split);
-	  		let b = o;
-		  	while (k.length > 1) {
-		  		const a = k.shift();
-		  		b = b[a] = b[a] || {};
-		  	}
-		  	delete b[k];
-		  	return o;
-	  	} catch (e) {
-		  	return undefined;
-	   	}
-  	}
-  };
-};
 class Lcdb {
 	constructor(path, options = { replacer: null, space: 2, split: "/" }) {
 		if (typeof path === "object") {
@@ -45,7 +6,6 @@ class Lcdb {
 			options = path;
 			if (options.path) delete options.path;
 		}
-		manager = manager(options.split);
 		this.options = options;
 		this.path = String(path ? path : "db");
 		this.obj = this._read(path);
@@ -54,16 +14,16 @@ class Lcdb {
 		return require("./package.json").version;
 	}
 	set(ref, value) {
-		manager.set(this.obj, ref, value);
+		manager(this.options.split).set(this.obj, ref, value);
 		this._write();
 		return true;
 	}
 	get(ref) {
-		return ref === this.options.split ? this.obj : manager.get(this.obj, ref);
+		return ref === this.options.split ? this.obj : manager(this.options.split).get(this.obj, ref);
 	}
 	delete(ref) {
 		if (ref === this.options.split) return this.clear();
-		else manager.delete(this.obj, ref);
+		else manager(this.options.split).delete(this.obj, ref);
 		this._write();
 		return true;
 	}
@@ -132,5 +92,44 @@ class Lcdb {
 		length && !existsSync(ref) && mkdirSync(ref, { recursive: true });
 		return writeFileSync(this.path + ".json", JSON.stringify(this.obj, this.options.replacer, this.options.space));
 	}
+}
+function manager(split) {
+	return {
+	  set: (o, k, v) => {
+	 	try {
+		  	k = String(k).split(split);
+		  	let b = o;
+		  	while (k.length > 1) {
+		  		const a = k.shift();
+		   		b = b[a] = b[a] || {};
+		   	}
+		  	b[k] = v;
+		  	return o;
+	  	} catch (e) {
+	  		return undefined;
+	  	}
+	  },
+  	get: (o, k) => {
+	  	try {
+		  	return String(k).split(split).reduce((a, b) => (a || {})[b], o);
+	  	} catch (e) {
+	  		return undefined;
+	  	}
+  	},
+  	delete: (o, k) => {
+		  try {
+		  	k = String(k).split(split);
+	  		let b = o;
+		  	while (k.length > 1) {
+		  		const a = k.shift();
+		  		b = b[a] = b[a] || {};
+		  	}
+		  	delete b[k];
+		  	return o;
+	  	} catch (e) {
+		  	return undefined;
+	   	}
+  	}
+  };
 }
 module.exports = (path, options) => new Lcdb(path, options);
