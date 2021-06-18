@@ -1,6 +1,5 @@
 const { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } = require("fs"),
 objm = require("objm");
-
 class Lcdb {
 	constructor(path, options = { replacer: null, space: 2 }) {
 		if (typeof path === "object") options = path;
