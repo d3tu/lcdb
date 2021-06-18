@@ -24,7 +24,7 @@ class Lcdb {
 		this._write();
 		return true;
 	}
-	stat() {
+	stats() {
 		return statSync(this.path);
 	}
 	add(ref, value) {

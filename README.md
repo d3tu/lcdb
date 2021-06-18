@@ -12,6 +12,7 @@ const db = require("lcdb")(
 db.set("ref", "data");
 db.get("ref or /");
 db.delete("ref or /");
+db.stats();
 db.add("ref", 123);
 db.subtract("ref", 123);
 db.push("ref", "value or ...values");
