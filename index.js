@@ -1,43 +1,43 @@
 const { readFileSync, writeFileSync, existsSync, mkdirSync, statSync } = require("fs");
-var manager = split => ({
+function manager(split) {
+	return {
 	set: (o, k, v) => {
-		try {
-			k = String(k).split(split);
-			let b = o;
-			while (k.length > 1) {
-				const a = k.shift();
-				b = b[a] = b[a] || {};
-			}
-			b[k] = v;
-			return o;
-		} catch (e) {
-			return undefined;
-		}
-	},
-	get: (o, k) => {
-		try {
-			return String(k)
-				.split(split)
-				.reduce((a, b) => (a || {})[b], o);
-		} catch (e) {
-			return undefined;
-		}
-	},
-	delete: (o, k) => {
-		try {
-			k = String(k).split(split);
-			let b = o;
-			while (k.length > 1) {
-				const a = k.shift();
-				b = b[a] = b[a] || {};
-			}
-			delete b[k];
-			return o;
-		} catch (e) {
-			return undefined;
-		}
-	}
-});
+	 	try {
+		  	k = String(k).split(split);
+		  	let b = o;
+		  	while (k.length > 1) {
+		  		const a = k.shift();
+		   		b = b[a] = b[a] || {};
+		   	}
+		  	b[k] = v;
+		  	return o;
+	  	} catch (e) {
+	  		return undefined;
+	  	}
+	  },
+  	get: (o, k) => {
+	  	try {
+		  	return String(k).split(split).reduce((a, b) => (a || {})[b], o);
+	  	} catch (e) {
+	  		return undefined;
+	  	}
+  	},
+  	delete: (o, k) => {
+		  try {
+		  	k = String(k).split(split);
+	  		let b = o;
+		  	while (k.length > 1) {
+		  		const a = k.shift();
+		  		b = b[a] = b[a] || {};
+		  	}
+		  	delete b[k];
+		  	return o;
+	  	} catch (e) {
+		  	return undefined;
+	   	}
+  	}
+  };
+};
 class Lcdb {
 	constructor(path, options = { replacer: null, space: 2, split: "/" }) {
 		if (typeof path === "object") {
