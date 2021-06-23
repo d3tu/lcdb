@@ -9,23 +9,25 @@ class Lcdb {
 		this.options = options;
 		this.path = String(path ? path : "db");
 		this.obj = this._read(path);
+		this.manager = manager(options.split);
 	}
 	get version() {
 		return require("./package.json").version;
 	}
 	set(ref, value) {
-		manager(this.options.split).set(this.obj, ref, value);
+		const data = this.manager.set(this.obj, ref, value);
 		this._write();
-		return true;
+		return data;
 	}
 	get(ref) {
-		return ref === this.options.split ? this.obj : manager(this.options.split).get(this.obj, ref);
+		return ref === this.options.split ? this.obj : this.manager.get(this.obj, ref);
 	}
 	delete(ref) {
+		let data = null;
 		if (ref === this.options.split) return this.clear();
-		else manager(this.options.split).delete(this.obj, ref);
+		else data = this.manager.delete(this.obj, ref);
 		this._write();
-		return true;
+		return data;
 	}
 	get stats() {
 		return existsSync(this.path + ".json") ? statSync(this.path + ".json") : null;
@@ -37,7 +39,7 @@ class Lcdb {
 		delete this.obj;
 		this.obj = {};
 		this._write();
-		return true;
+		return {};
 	}
 	add(ref, value) {
 		return this.set(ref, Number(this.get(ref) || 0) + Number(value));
@@ -132,4 +134,8 @@ function manager(split) {
   	}
   };
 }
-module.exports = (path, options) => new Lcdb(path, options);
+function getdb(path, options) {
+	return new Lcdb(path, options);
+}
+Object.assign(getdb, getdb("db"));
+module.exports = getdb;
