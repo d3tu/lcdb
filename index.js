@@ -134,8 +134,4 @@ function manager(split) {
   	}
   };
 }
-function getdb(path, options) {
-	return new Lcdb(path, options);
-}
-Object.assign(getdb, getdb("db"));
-module.exports = getdb;
+module.exports = (...args) => new Lcdb(...args);

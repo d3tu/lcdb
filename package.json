@@ -1,6 +1,6 @@
 {
 	"name": "lcdb",
-	"version": "5.1.9",
+	"version": "5.2.0",
 	"description": "Local database using File System.",
 	"main": "index.js",
 	"keywords": ["filesystem", "fs", "localdatabase", "db"],
